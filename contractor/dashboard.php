@@ -76,11 +76,11 @@ if (!isset($_SESSION['user_id'])) {
 
 <div class="card">
 
-<p>👨‍🌾 Growers Assigned : <strong>3</strong></p>
+<p>Growers Assigned : <strong>3</strong></p>
 
-<p>📄 Active Contracts : <strong>3</strong></p>
+<p>Active Contracts : <strong>3</strong></p>
 
-<p>🌱 Current Season : <strong>2026</strong></p>
+<p>Current Season : <strong>2026</strong></p>
 
 </div>
 

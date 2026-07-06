@@ -15,7 +15,7 @@ $role = $_GET['role'] ?? '';
 <body>
 
 <div class="header">
-    <h1>🍃 LeafLink</h1>
+    <h1>LeafLink</h1>
     <p>Contract Farming Management System</p>
 </div>
 
