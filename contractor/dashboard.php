@@ -64,9 +64,11 @@ if (!isset($_SESSION['user_id'])) {
 
 </div>
 
-<div class="content">
+    <div class="hero">
+        <div class="content">
 
-<div class="container">
+    <div class="container">
+
 
 <div class="card">
 
@@ -102,8 +104,12 @@ if (!isset($_SESSION['user_id'])) {
 
 <a class="btn" href="../logout.php">Logout</a>
 
+
+        </div>
+</div>
+    </div>
 </div>
 
 </body>
-
 </html>
+

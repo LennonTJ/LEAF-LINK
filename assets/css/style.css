@@ -1,5 +1,15 @@
 /* RESET */
 
+:root{
+    /* HERO (gradient + dotted SVG overlay) */
+    --hero-bg-1: #1f6f3a;
+    --hero-bg-2: #0f3d22;
+    --hero-dots-color: rgba(255,255,255,.22);
+    --hero-dots-size: 22; /* px */
+    --hero-dots-opacity: .55;
+    --hero-overlay-opacity: .65;
+}
+
 *{
     margin:0;
     padding:0;
@@ -9,6 +19,37 @@
 body{
     font-family:Arial, Helvetica, sans-serif;
     background:#f4f6f9;
+}
+
+/* HERO */
+
+.hero{
+    position:relative;
+    overflow:hidden;
+    background: linear-gradient(135deg, var(--hero-bg-1), var(--hero-bg-2));
+}
+
+.hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    opacity: var(--hero-overlay-opacity);
+    background:
+        /* Gradient */
+        linear-gradient(135deg, rgba(31,111,58,.95), rgba(15,61,34,.95)),
+        /* Dotted SVG overlay */
+        url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='22'%20height='22'%20viewBox='0%200%2022%2022'%3E%3Cg%20fill='none'%20stroke='%23ffffff'%20stroke-opacity='1'%3E%3Ccircle%20cx='3'%20cy='3'%20r='1'%20fill='%23ffffff'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:
+        100% 100%,
+        calc(var(--hero-dots-size) * 1px) calc(var(--hero-dots-size) * 1px);
+    background-repeat: no-repeat, repeat;
+    pointer-events:none;
+}
+
+.hero > *{
+    position:relative;
+    z-index:1;
 }
 
 /* HEADER */
@@ -181,6 +222,7 @@ th{
 }
 
 th,
+
 td{
 
     padding:12px;
@@ -233,3 +275,4 @@ button:hover{
 body{
     background:#f3f8f3;
 }
+

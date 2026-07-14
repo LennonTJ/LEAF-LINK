@@ -31,7 +31,7 @@ $grower=mysqli_fetch_assoc($result);
 
 <body>
 
-<h1>🍃 LeafLink</h1>
+<h1>LeafLink</h1>
 
 <h2>Grower Profile</h2>
 

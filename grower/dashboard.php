@@ -33,6 +33,9 @@ if (!isset($_SESSION['user_id'])) {
         <h4>Sales</h4>
         <a href="#">Sales History</a>
 
+        <h4>Sale Projection</h4>
+        <a href="projection.php">Sale Projection</a>
+
         <h4>Support</h4>
         <a href="#">Contact Contractor</a>
 
@@ -40,6 +43,7 @@ if (!isset($_SESSION['user_id'])) {
         <a href="../logout.php">Logout</a>
     </div>
 
+<div class="hero">
     <div class="content">
         <div class="card">
             <h2>Welcome Lennon Jenifani</h2>
@@ -54,9 +58,10 @@ if (!isset($_SESSION['user_id'])) {
             <p> Total Bales Sold : <strong>13</strong></p>
             <p> Total Mass : <strong>1040 kg</strong></p>
             <p> Total Sales : <strong>$2,005.75</strong></p>
-            <p> Average Price : <strong>$1.93/kg</strong></p>
         </div>
     </div>
 </div>
+</div>
 </body>
 </html>
+

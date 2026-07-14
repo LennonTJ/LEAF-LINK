@@ -3,7 +3,8 @@
 session_start();
 include("../config/database.php");
 
-function verifyStoredPassword(string $password, string $storedPassword): bool {
+function verifyStoredPassword(string $password, string $storedPassword): bool
+{
     if ($storedPassword === '') {
         return false;
     }
@@ -31,16 +32,42 @@ mysqli_stmt_execute($stmt);
 
 $result = mysqli_stmt_get_result($stmt);
 
-if ($user = mysqli_fetch_assoc($result)) {
-
-    if (verifyStoredPassword($password, $user['password_hash'])) {
-
+if ($user = mysqli_fetch_assoc($result))
+{
+    if (verifyStoredPassword($password, $user['password_hash']))
+    {
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['user_type'];
 
-        switch ($user['user_type']) {
+        // Get grower ID if this is a grower account
+        if ($user['user_type'] == 'grower')
+        {
+            $sql2 = "SELECT grower_id
+                     FROM growers
+                     WHERE user_id = ?";
 
+            $stmt2 = mysqli_prepare($conn, $sql2);
+
+            mysqli_stmt_bind_param(
+                $stmt2,
+                "i",
+                $user['user_id']
+            );
+
+            mysqli_stmt_execute($stmt2);
+
+            $result2 = mysqli_stmt_get_result($stmt2);
+
+            if ($grower = mysqli_fetch_assoc($result2))
+            {
+                $_SESSION['grower_id'] =
+                    $grower['grower_id'];
+            }
+        }
+
+        switch ($user['user_type'])
+        {
             case 'admin':
                 header("Location: ../admin/dashboard.php");
                 break;
@@ -55,9 +82,7 @@ if ($user = mysqli_fetch_assoc($result)) {
         }
 
         exit();
-
     }
-
 }
 
 echo "Invalid username or password.";

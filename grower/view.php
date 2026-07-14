@@ -61,7 +61,7 @@ $result = mysqli_stmt_get_result($stmt);
 
 <a href="add.php">
 
-➕ Register Grower
+Register Grower
 
 </a>
 

@@ -51,6 +51,7 @@ if (!isset($_SESSION['user_id'])) {
         <a href="../logout.php">Logout</a>
     </div>
 
+<div class="hero">
     <div class="content">
         <div class="card">
             <h2>Welcome Administrator</h2>
@@ -66,6 +67,9 @@ if (!isset($_SESSION['user_id'])) {
         </div>
     </div>
 </div>
+
+</div>
+
 
 </body>
 </html>
