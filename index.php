@@ -11,11 +11,11 @@
     <style>
         /* Nature-Inspired Theme */
         :root {
-            --primary: #4a7c59;
+            --primary: #0bca44;
             --secondary: #f4a261;
             --accent: #e76f51;
             --light-green: #b8d4b0;
-            --cream: #fefae0;
+            --cream: #f4fdaf;
             --text: #2d3e2d;
             --shadow: 0 8px 32px rgba(74, 124, 89, 0.15);
         }
@@ -35,7 +35,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--primary) 0%, #2d5a3d 100%);
+            background:#2d5a3d 100%;
             color: white;
             padding: 70px 20px 50px;
             text-align: center;
@@ -84,7 +84,7 @@
 
         .card {
             background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 35px;
             box-shadow: var(--shadow);
@@ -93,27 +93,27 @@
         }
 
         .card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-1px);
             box-shadow: 0 12px 40px rgba(74, 124, 89, 0.2);
         }
 
         .card h2 {
-            color: var(--primary);
+            color: solid black;
             font-size: 1.7rem;
-            font-weight: 700;
+            font-weight: 400;
             margin-bottom: 15px;
         }
 
         .btn {
             display: inline-block;
             padding: 16px 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, #2d5a3d 100%);
+            background: #2d5a3d 100%;
             color: white;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 700;
             font-size: 1rem;
-            transition: all 0.3s;
+            transition: all 0.2s;
             border: none;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(74, 124, 89, 0.3);
@@ -125,22 +125,21 @@
         }
 
         .btn::before {
-            content: "→";
             margin-right: 8px;
-            transition: transform 0.3s;
+            transition: transform 0.2s;
             display: inline-block;
         }
 
         .btn:hover::before {
-            transform: translateX(5px);
+            transform: translateX(3px);
         }
 
         .btn:hover {
-            transform: translateY(-3px) scale(1.02);
+            transform: translateY(-2px) scale(1.02);
             box-shadow: 0 8px 25px rgba(74, 124, 89, 0.4);
         }
 
-        /* Responsive */
+        
         @media (max-width: 520px) {
             .header h1 { font-size: 2.6rem; }
             .card { padding: 22px; border-radius: 18px; }
@@ -150,7 +149,7 @@
 <body>
 
 <div class="header">
-    <h1>LeafLink</h1>
+    <a style = "text-decoration: none" href='index.php' > <h1 style="color: #ffffff;">LeafLink</h1> </a>
     <p>Contract Farming Management System</p>
 </div>
 
@@ -158,18 +157,14 @@
     <div style="padding:30px; max-width:900px; margin:0 auto;">
         <div class="card" style="margin-bottom:25px;">
             <h2>Connecting Every Leaf to Every Ledger.</h2>
-            <p style="font-weight:300; opacity:.9;">Select a portal to continue.</p>
+            <p style="font-weight:200; opacity:.9;">Select a portal to continue.</p>
         </div>
 
-        <div class="card" style="background:transparent; box-shadow:none; padding:0; border:0;">
-            <h2 style="padding:35px 35px 15px 35px; margin-bottom:0;">Select Portal</h2>
-
-            <div style="padding:0 35px 35px 35px; display:flex; flex-direction:column; gap:14px; align-items:flex-start;">
+            <div style="padding:0 35px 35px 35px; display:flex; flex-direction:column; gap:17px; align-items:flex-start;">
                 <a class="btn" href="auth/login.php?role=grower">Grower Portal</a>
                 <a class="btn" href="auth/login.php?role=contractor">Contractor Portal</a>
                 <a class="btn" href="auth/login.php?role=admin">Administrator Portal</a>
             </div>
-        </div>
     </div>
 </div>
 

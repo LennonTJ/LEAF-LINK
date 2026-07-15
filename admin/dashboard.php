@@ -10,6 +10,23 @@ if (!isset($_SESSION['user_id'])) {
 
 }
 
+include("../config/database.php");
+
+// load counts
+$registered_growers = 0;
+$contractors_count = 0;
+$active_contracts = 0;
+$current_season = '';
+
+$r = mysqli_query($conn, "SELECT COUNT(*) AS cnt FROM growers");
+if ($r) { $row = mysqli_fetch_assoc($r); $registered_growers = $row['cnt'] ?? 0; }
+$r = mysqli_query($conn, "SELECT COUNT(*) AS cnt FROM contractors");
+if ($r) { $row = mysqli_fetch_assoc($r); $contractors_count = $row['cnt'] ?? 0; }
+$r = mysqli_query($conn, "SELECT COUNT(*) AS cnt FROM contracts WHERE status='active'");
+if ($r) { $row = mysqli_fetch_assoc($r); $active_contracts = $row['cnt'] ?? 0; }
+$r = mysqli_query($conn, "SELECT season_name FROM seasons WHERE is_active=1 LIMIT 1");
+if ($r && $sr = mysqli_fetch_assoc($r)) { $current_season = $sr['season_name']; }
+
 ?>
 
 <!DOCTYPE html>
@@ -60,10 +77,10 @@ if (!isset($_SESSION['user_id'])) {
 
         <div class="card">
             <h2>Dashboard Summary</h2>
-            <p>Registered Growers : <strong>3</strong></p>
-            <p>Contractors : <strong>1</strong></p>
-            <p>Active Contracts : <strong>3</strong></p>
-            <p>Current Season : <strong>2026</strong></p>
+            <p>Registered Growers : <strong><?php echo intval($registered_growers); ?></strong></p>
+            <p>Contractors : <strong><?php echo intval($contractors_count); ?></strong></p>
+            <p>Active Contracts : <strong><?php echo intval($active_contracts); ?></strong></p>
+            <p>Current Season : <strong><?php echo htmlspecialchars($current_season ?: date('Y')); ?></strong></p>
         </div>
     </div>
 </div>
