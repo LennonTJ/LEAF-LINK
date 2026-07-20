@@ -15,8 +15,8 @@
             --secondary: #f4a261;
             --accent: #e76f51;
             --light-green: #b8d4b0;
-            --cream: #f4fdaf;
-            --text: #2d3e2d;
+            --cream: #ffffff;
+            --text: #137813;
             --shadow: 0 8px 32px rgba(74, 124, 89, 0.15);
         }
 
@@ -35,7 +35,7 @@
         }
 
         .header {
-            background:#2d5a3d 100%;
+            background: #36854e 100%;
             color: white;
             padding: 70px 20px 50px;
             text-align: center;
@@ -44,7 +44,6 @@
         }
 
         .header::before {
-            content: "🌱";
             position: absolute;
             font-size: 200px;
             opacity: 0.06;
@@ -54,7 +53,6 @@
         }
 
         .header::after {
-            content: "🌻";
             position: absolute;
             font-size: 150px;
             opacity: 0.06;

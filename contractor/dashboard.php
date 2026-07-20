@@ -175,7 +175,7 @@ if ($contractor_id) {
 
 <div class="card">
 
-<p>Growers Assigned : <strong><?php echo intval($assigned_growers); ?></strong></p>
+<p>Contracted Growers : <strong><?php echo intval($assigned_growers); ?></strong></p>
 
 <p>Active Contracts : <strong><?php echo intval($active_contracts); ?></strong></p>
 
