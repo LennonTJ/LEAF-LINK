@@ -145,6 +145,8 @@ if ($contractor_id) {
 
 <h4>Sales</h4>
 
+<a href="upload_sales.php">Upload Sale sheets</a>
+
 <a href="#">Sales History</a>
 
 <h4>Finance</h4>

@@ -121,8 +121,15 @@ if (isset($_POST['upload']) && isset($_FILES['sale_pdf'])) {
 
                     if (mysqli_stmt_execute($stmt)) {
 
-                        $message = "TIMB sale sheet uploaded successfully and is ready for analysis.";
-                        $type = "success";
+                        // Get the ID of the uploaded_files record
+                        $file_id = mysqli_insert_id($conn);
+
+                        // Redirect to the preview page
+                        header(
+                            "Location: confirm_import.php?file=" . urlencode($new_name) . "&file_id=" . $file_id
+                        );
+
+                        exit();
 
                     } else {
 
