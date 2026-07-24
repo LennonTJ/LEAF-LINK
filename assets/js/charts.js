@@ -813,9 +813,6 @@ function createContractStatusChart(
 }
 
 
-
-
-
 /*
 |--------------------------------------------------------------------------
 | Regional Performance Data Formatter
@@ -848,11 +845,6 @@ function createRegionalPerformanceMatrix(regionData){
     };
 
 
-}
-
-window.LeafLinkCharts = {
-    createProductionTrendChart,
-    createRevenueChart,
 }
 
 /*
