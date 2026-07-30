@@ -84,58 +84,36 @@ if ($grower_id) {
         <a href="../logout.php">Logout</a>
     </div>
 
-<div class="hero">
     <div class="content">
-        <div class="card">
-            <h2>Welcome <?php echo htmlspecialchars(($grower['first_name'] ?? '') . ' ' . ($grower['last_name'] ?? '')); ?></h2>
-            <p><strong>Grower Number:</strong> <?php echo htmlspecialchars($grower['grower_no'] ?? ''); ?></p>
-            <p><strong>Contractor:</strong> <?php echo htmlspecialchars($contractor_name ?: ''); ?></p>
-            <p><strong>Season:</strong> <?php echo htmlspecialchars($season ?: date('Y')); ?></p>
-            <p><strong>Status:</strong> <?php echo htmlspecialchars($status); ?></p>
+        <!-- Compact Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="header-greeting">
+                <h2>Welcome, <?php echo htmlspecialchars(($grower['first_name'] ?? '') . ' ' . ($grower['last_name'] ?? '')); ?></h2>
+            </div>
+            <div class="header-badges">
+                <span class="info-badge badge-grower">
+                    <span class="badge-label">Grower #</span>
+                    <span class="badge-value"><?php echo htmlspecialchars($grower['grower_no'] ?? ''); ?></span>
+                </span>
+                <span class="info-badge badge-contractor">
+                    <span class="badge-label">Contractor</span>
+                    <span class="badge-value"><?php echo htmlspecialchars($contractor_name ?: 'N/A'); ?></span>
+                </span>
+                <span class="info-badge badge-season">
+                    <span class="badge-label">Season</span>
+                    <span class="badge-value"><?php echo htmlspecialchars($season ?: date('Y')); ?></span>
+                </span>
+                <span class="info-badge badge-status <?php echo strtolower($status); ?>">
+                    <span class="badge-label">Status</span>
+                    <span class="badge-value"><?php echo htmlspecialchars($status); ?></span>
+                </span>
+            </div>
         </div>
 
-        <!-- Embedded Visualizations -->
-        <div class="card">
-            <h2>Performance Charts</h2>
-            <!-- Date Range Controls -->
-            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
-                <label for="startDate">From:</label>
-                <input type="date" id="startDate" name="startDate">
-                <label for="endDate">To:</label>
-                <input type="date" id="endDate" name="endDate">
-                <button id="applyDateFilter" style="padding:6px 10px;">Apply</button>
-                <button id="clearDateFilter" style="padding:6px 10px;">Clear</button>
-            </div>
+        <!-- KPI Cards -->
+        <div class="metrics-row" id="kpiCards">
 
-            <div class="dashboard-grid">
-                <div style="flex:1 1 600px;">
-                    <h4>Sales Performance Trend</h4>
-                    <canvas id="productionChart"></canvas>
-                    <p style="font-size:12px; color:#666; margin-top:6px;">Daily kilograms sold and revenue (dual axis). Use date filter to narrow range.</p>
-                </div>
-                <div style="flex:1 1 360px;">
-                    <h4>Tobacco Quality Distribution</h4>
-                    <canvas id="qualityChart"></canvas>
-                    <p style="font-size:12px; color:#666; margin-top:6px;">Volume (kg) by TIMB grade.</p>
-                </div>
-                <div style="flex:1 1 360px;">
-                    <h4>Revenue vs Debt Impact</h4>
-                    <canvas id="revenueDebtChart"></canvas>
-                    <p style="font-size:12px; color:#666; margin-top:6px;">Gross revenue → deductions → final expected payout.</p>
-                </div>
-            </div>
-
-            <!-- KPI SUMMARY TOP ROW -->
-
-            <h3 style="margin-top:20px;">
-            Performance Summary
-            </h3>
-
-
-            <div class="metrics-row" id="kpiCards">
-
-
-                <div class="metric-card">
+            <div class="metric-card">
 
                 <h3>Total Kgs Sold</h3>
 
@@ -147,11 +125,9 @@ if ($grower_id) {
                 kg
                 </p>
 
-                </div>
+            </div>
 
-
-
-                <div class="metric-card">
+            <div class="metric-card">
 
                 <h3>Bales Sold</h3>
 
@@ -163,11 +139,9 @@ if ($grower_id) {
                 bales
                 </p>
 
-                </div>
+            </div>
 
-
-
-                <div class="metric-card">
+            <div class="metric-card">
 
                 <h3>Rejected Bales</h3>
 
@@ -179,11 +153,9 @@ if ($grower_id) {
                 bales
                 </p>
 
-                </div>
+            </div>
 
-
-
-                <div class="metric-card">
+            <div class="metric-card">
 
                 <h3>Average Price</h3>
 
@@ -195,11 +167,9 @@ if ($grower_id) {
                 USD/kg
                 </p>
 
-                </div>
+            </div>
 
-
-
-                <div class="metric-card">
+            <div class="metric-card">
 
                 <h3>Total Revenue</h3>
 
@@ -211,11 +181,9 @@ if ($grower_id) {
                 USD
                 </p>
 
-                </div>
+            </div>
 
-
-
-                <div class="metric-card">
+            <div class="metric-card">
 
                 <h3>Debt Recovered</h3>
 
@@ -227,11 +195,9 @@ if ($grower_id) {
                 %
                 </p>
 
-                </div>
+            </div>
 
-
-
-                <div class="metric-card">
+            <div class="metric-card">
 
                 <h3>Outstanding Debt</h3>
 
@@ -243,13 +209,39 @@ if ($grower_id) {
                 USD
                 </p>
 
-                </div>
+            </div>
 
+        </div>
 
-                </div>
+        <!-- Date Range Controls -->
+        <div class="filter-bar">
+            <label for="startDate">From:</label>
+            <input type="date" id="startDate" name="startDate">
+            <label for="endDate">To:</label>
+            <input type="date" id="endDate" name="endDate">
+            <button id="applyDateFilter">Apply</button>
+            <button id="clearDateFilter" class="btn-secondary">Clear</button>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="dashboard-grid">
+            <div class="chart-card">
+                <h4>Sales Performance Trend</h4>
+                <canvas id="productionChart"></canvas>
+                <p class="chart-note">Daily kilograms sold and revenue (dual axis). Use date filter to narrow range.</p>
+            </div>
+            <div class="chart-card">
+                <h4>Tobacco Quality Distribution</h4>
+                <canvas id="qualityChart"></canvas>
+                <p class="chart-note">Volume (kg) by TIMB grade.</p>
+            </div>
+            <div class="chart-card">
+                <h4>Revenue vs Debt Impact</h4>
+                <canvas id="revenueDebtChart"></canvas>
+                <p class="chart-note">Gross revenue → deductions → final expected payout.</p>
+            </div>
         </div>
     </div>
-</div>
 </div>
 </body>
 </html>

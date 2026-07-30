@@ -141,7 +141,9 @@ if ($contractor_id) {
 
 <h4>Growers</h4>
 
-<a href="#">Assigned Growers</a>
+<a href="contracted_growers.php">Contracted Growers</a>
+
+<a href="risk_analysis.php">Risk Analysis</a>
 
 <h4>Sales</h4>
 
