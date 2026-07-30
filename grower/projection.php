@@ -59,7 +59,50 @@ if (!empty($_SESSION['last_projection']) && is_array($_SESSION['last_projection'
     unset($_SESSION['last_projection']);
 }
 
-// TIMB lookup tables (used for explanations)
+// Simulation Summary Data
+
+$summary_count = 0;
+$summary_mass = 0.00;
+$summary_sales = 0.00;
+
+
+if ($grower_id) {
+
+    $ps = mysqli_prepare(
+        $conn,
+        "SELECT 
+            COUNT(*) AS cnt,
+            COALESCE(SUM(estimated_kg),0) AS mass,
+            COALESCE(SUM(projected_revenue),0) AS sales
+        FROM sale_projections
+        WHERE grower_id = ?"
+    );
+
+
+    if ($ps) {
+
+        mysqli_stmt_bind_param($ps, "i", $grower_id);
+
+        mysqli_stmt_execute($ps);
+
+        $prs = mysqli_stmt_get_result($ps);
+
+
+        if ($prow = mysqli_fetch_assoc($prs)) {
+
+            $summary_count = $prow['cnt'];
+
+            $summary_mass = $prow['mass'];
+
+            $summary_sales = $prow['sales'];
+
+        }
+
+    }
+
+}
+
+// lookup tables (used for explanations)
 $quality_lookup = [
     "1" => "Very Good",
     "2" => "Good",
@@ -429,10 +472,17 @@ $<?php echo number_format($grower['total_debt'],2); ?>
 </p>
 
 </div>
+<div class="card">
+            <h2>Sale Simulation Summary</h2>
+            <p> Total Projections : <strong><?php echo intval($summary_count); ?></strong></p>
+            <p> Total Mass : <strong><?php echo number_format($summary_mass,2); ?> kg</strong></p>
+            <p> Total Projected Sales : <strong>$<?php echo number_format($summary_sales,2); ?></strong></p>
+        </div>
 
 <div class="card">
 
-<h2>Analyse Sale</h2>
+<h3 style="color: black;">Please provide tobacco details:</h3>
+</br>
 
 <form method="POST">
 
@@ -450,7 +500,7 @@ $<?php echo number_format($grower['total_debt'],2); ?>
 <br><br>
 
 
-<label>Quality (TIMB)</label>
+<label>Quality</label>
 
 <br><br>
 
@@ -476,7 +526,7 @@ $<?php echo number_format($grower['total_debt'],2); ?>
 
 <br><br>
 
-<label>Style</label>
+<label>Style (optional)</label>
 
 <br><br>
 
@@ -489,7 +539,7 @@ $<?php echo number_format($grower['total_debt'],2); ?>
 
 <br><br>
 
-<label>Extra Factor</label>
+<label>Extra Factor (optional)</label>
 
 <br><br>
 
@@ -502,7 +552,7 @@ $<?php echo number_format($grower['total_debt'],2); ?>
 
 <br><br>
 
-<label>Estimated Kilograms</label>
+<label>Bale Kilograms</label>
 
 <br><br>
 

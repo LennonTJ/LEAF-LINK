@@ -168,42 +168,453 @@ if ($contractor_id) {
 
     <div class="container">
 
-
 <div class="card">
 
-<h2>Welcome Contractor</h2>
+<h2>Welcome <?php echo htmlspecialchars($contractor_name); ?></h2>
+
+<p>Current Season :
+<strong><?php echo htmlspecialchars($current_season ?: date('Y')); ?></strong></p>
 
 </div>
 
-<div class="card">
 
-<p>Contracted Growers : <strong><?php echo intval($assigned_growers); ?></strong></p>
+<h2 style="margin:20px 0;">
+Contractor Performance
+</h2>
 
-<p>Active Contracts : <strong><?php echo intval($active_contracts); ?></strong></p>
 
-<p>Current Season : <strong><?php echo htmlspecialchars($current_season ?: date('Y')); ?></strong></p>
+<div class="metrics-row">
 
-</div>
 
-<div class="card">
+<div class="metric-card">
 
-<h3>Assigned Growers</h3>
+<h3>Growers</h3>
 
-<ul>
-<?php foreach ($assigned_list as $g) { ?>
-    <li><?php echo htmlspecialchars($g['grower_no'] . ' - ' . $g['first_name'] . ' ' . $g['last_name']); ?></li>
-<?php } ?>
-</ul>
+<div class="metric-value" id="metricGrowers">-</div>
+
+<div class="metric-unit">Active</div>
 
 </div>
 
-<a class="btn" href="../logout.php">Logout</a>
 
 
-        </div>
+<div class="metric-card">
+
+<h3>Total Kg</h3>
+
+<div class="metric-value" id="metricKg">-</div>
+
+<div class="metric-unit">kg</div>
+
 </div>
+
+
+
+<div class="metric-card">
+
+<h3>Total Revenue</h3>
+
+<div class="metric-value" id="metricRevenue">-</div>
+
+<div class="metric-unit">USD</div>
+
+</div>
+
+
+
+<div class="metric-card">
+
+<h3>Average Price</h3>
+
+<div class="metric-value" id="metricPrice">-</div>
+
+<div class="metric-unit">$/kg</div>
+
+</div>
+
+
+
+<div class="metric-card">
+
+<h3>Bales Sold</h3>
+
+<div class="metric-value" id="metricBales">-</div>
+
+<div class="metric-unit">Bales</div>
+
+</div>
+
+
+
+<div class="metric-card">
+
+<h3>Rejected</h3>
+
+<div class="metric-value" id="metricRejected">-</div>
+
+<div class="metric-unit">Bales</div>
+
+</div>
+
+
+
+<div class="metric-card">
+
+<h3>Recovery Risk</h3>
+
+<div class="metric-value" id="metricRisk">-</div>
+
+<div class="metric-unit">Growers</div>
+
+</div>
+
+
+</div>
+
+
+
+<div class="dashboard-grid">
+
+    <div>
+
+        <h3>Sales Trend</h3>
+
+        <canvas id="salesTrend"></canvas>
+
     </div>
+
+
+    <div>
+
+        <h3>Grade Distribution</h3>
+
+        <canvas id="gradeChart"></canvas>
+
+    </div>
+
+
+    <div>
+
+        <h3>Best Performing Growers</h3>
+
+        <canvas id="growerChart"></canvas>
+
+    </div>
+
+
+    <div>
+
+        <h3>Grower Recovery Risk Classification</h3>
+
+        <canvas id="riskChart"></canvas>
+
+    </div>
+
 </div>
+
+<div class="card">
+
+<div class="card">
+
+<h3>Recovery Risk Overview</h3>
+
+
+<div class="metrics-row">
+
+
+<div class="metric-card">
+
+<h3>High Risk</h3>
+
+<div class="metric-value" id="highRisk">
+-
+</div>
+
+<p class="metric-unit">
+Growers
+</p>
+
+</div>
+
+
+
+<div class="metric-card">
+
+<h3>Medium Risk</h3>
+
+<div class="metric-value" id="mediumRisk">
+-
+</div>
+
+<p class="metric-unit">
+Growers
+</p>
+
+</div>
+
+
+
+
+<div class="metric-card">
+
+<h3>Low Risk</h3>
+
+<div class="metric-value" id="lowRisk">
+-
+</div>
+
+<p class="metric-unit">
+Growers
+</p>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+async function loadContractorMetrics(){
+
+const response = await fetch(
+"../api/contractor-data.php?action=metrics"
+);
+
+
+const data = await response.json();
+
+
+document.getElementById("metricGrowers").textContent =
+data.growers;
+
+
+document.getElementById("metricKg").textContent =
+Number(data.mass).toLocaleString();
+
+
+document.getElementById("metricRevenue").textContent =
+"$"+Number(data.sales).toLocaleString();
+
+
+document.getElementById("metricPrice").textContent =
+"$"+(data.sales/data.mass).toFixed(2);
+
+
+
+document.getElementById("metricRejected").textContent =
+data.rejected_bales;
+
+
+document.getElementById("metricRisk").textContent =
+data.risk_count;
+
+document.getElementById("metricBales").textContent =
+    data.total_bales ?? 0;
+
+
+
+}
+
+
+document.addEventListener(
+"DOMContentLoaded",
+loadContractorMetrics
+);
+
+
+</script>
+<script>
+
+async function loadContractorMetrics(){
+
+    try{
+
+        const response = await fetch("../api/contractor-data.php?action=metrics");
+
+        const data = await response.json();
+
+
+        console.log("Contractor Metrics:", data);
+
+
+        document.getElementById("metricGrowers").textContent =
+            data.active_growers ?? 0;
+
+
+        document.getElementById("metricKg").textContent =
+            (data.total_kg ?? 0).toLocaleString() + " kg";
+
+
+        document.getElementById("metricRevenue").textContent =
+            "$" + (data.total_revenue ?? 0).toFixed(2);
+
+
+        document.getElementById("metricPrice").textContent =
+            "$" + (data.average_price ?? 0).toFixed(2);
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Contractor dashboard error:",
+            error
+        );
+
+    }
+
+}
+
+
+document.addEventListener(
+"DOMContentLoaded",
+loadContractorMetrics
+);
+
+
+</script>
+<script>
+// load risk data
+async function loadRecoveryRisk(){
+
+    try{
+
+        const response = await fetch(
+            "../api/contractor-data.php?action=recovery_risk"
+        );
+
+
+        const data = await response.json();
+
+
+        console.log("Recovery Risk:", data);
+
+
+
+        let rows = "";
+
+
+        data.forEach(g => {
+
+
+            rows += `
+
+            <tr>
+
+            <td>
+            ${g.grower}
+            </td>
+
+
+            <td>
+            $${Number(g.revenue).toFixed(2)}
+            </td>
+
+
+            <td>
+            $${Number(g.debt).toFixed(2)}
+            </td>
+
+
+            <td>
+            ${g.recovery}%
+            </td>
+
+
+            <td>
+            <span class="performance-badge ${g.risk.toLowerCase()}">
+            ${g.risk}
+            </span>
+            </td>
+
+
+            </tr>
+
+            `;
+
+
+        });
+
+
+        document.getElementById("riskTable").innerHTML = rows;
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Recovery risk error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+window.addEventListener(
+"load",
+loadRecoveryRisk
+);
+
+
+/// risk sammury data
+async function loadRecoverySummary(){
+
+    try{
+
+
+        const res = await fetch(
+            "../api/contractor-data.php?action=recovery_summary"
+        );
+
+
+        const data = await res.json();
+
+
+        console.log(
+            "Recovery Summary:",
+            data
+        );
+
+
+        document.getElementById("highRisk").textContent =
+            data.high ?? 0;
+
+
+        document.getElementById("mediumRisk").textContent =
+            data.medium ?? 0;
+
+
+        document.getElementById("lowRisk").textContent =
+            data.low ?? 0;
+
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Recovery summary error:",
+            error
+        );
+
+    }
+
+}
+
+
+window.addEventListener(
+"load",
+loadRecoverySummary
+);
+
+</script>
 
 </body>
 </html>

@@ -41,18 +41,7 @@ if ($grower_id) {
         $season = $sr['season_name'];
     }
 
-    // Summary from sale_projections for this grower
-    $ps = mysqli_prepare($conn, "SELECT COUNT(*) AS cnt, COALESCE(SUM(estimated_kg),0) AS mass, COALESCE(SUM(projected_revenue),0) AS sales FROM sale_projections WHERE grower_id = ?");
-    if ($ps) {
-        mysqli_stmt_bind_param($ps, "i", $grower_id);
-        mysqli_stmt_execute($ps);
-        $prs = mysqli_stmt_get_result($ps);
-        if ($prow = mysqli_fetch_assoc($prs)) {
-            $summary_count = $prow['cnt'] ?? 0;
-            $summary_mass = $prow['mass'] ?? 0.00;
-            $summary_sales = $prow['sales'] ?? 0.00;
-        }
-    }
+   
 
 }
 ?>
@@ -105,13 +94,6 @@ if ($grower_id) {
             <p><strong>Status:</strong> <?php echo htmlspecialchars($status); ?></p>
         </div>
 
-        <div class="card">
-            <h2>Dashboard Summary</h2>
-            <p> Total Projections : <strong><?php echo intval($summary_count); ?></strong></p>
-            <p> Total Mass : <strong><?php echo number_format($summary_mass,2); ?> kg</strong></p>
-            <p> Total Projected Sales : <strong>$<?php echo number_format($summary_sales,2); ?></strong></p>
-        </div>
-
         <!-- Embedded Visualizations -->
         <div class="card">
             <h2>Performance Charts</h2>
@@ -125,7 +107,7 @@ if ($grower_id) {
                 <button id="clearDateFilter" style="padding:6px 10px;">Clear</button>
             </div>
 
-            <div class="dashboard-grid" style="display:flex; gap:20px; flex-wrap:wrap;">
+            <div class="dashboard-grid">
                 <div style="flex:1 1 600px;">
                     <h4>Sales Performance Trend</h4>
                     <canvas id="productionChart"></canvas>
@@ -143,37 +125,128 @@ if ($grower_id) {
                 </div>
             </div>
 
-            <h3 style="margin-top:20px;">Performance Summary</h3>
+            <!-- KPI SUMMARY TOP ROW -->
+
+            <h3 style="margin-top:20px;">
+            Performance Summary
+            </h3>
+
+
             <div class="metrics-row" id="kpiCards">
-                <div class="metric-card" id="card_total_kgs">
-                    <h3>Total Kgs Sold</h3>
-                    <p class="metric-value" id="metric_total_kgs">-</p>
-                    <p class="metric-unit">kg</p>
-                </div>
-            <div class="card" style="margin-top:18px;">
-                <h3>Farmer Performance Insights</h3>
-                <ul id="insightsList" style="margin-top:10px; color:#333;"></ul>
-            </div>
 
-                <div class="metric-card" id="card_total_revenue">
-                    <h3>Total Revenue</h3>
-                    <p class="metric-value" id="metric_total_revenue">-</p>
-                    <p class="metric-unit">USD</p>
-                </div>
 
-                <div class="metric-card" id="card_debt_recovered">
-                    <h3>Debt Recovered</h3>
-                    <p class="metric-value" id="metric_debt_recovered">-</p>
-                    <p class="metric-unit">%</p>
-                    <canvas id="debtProgressChart" style="max-width:140px; margin: 6px auto 0; display:block;"></canvas>
+                <div class="metric-card">
+
+                <h3>Total Kgs Sold</h3>
+
+                <p class="metric-value" id="metric_total_kgs">
+                -
+                </p>
+
+                <p class="metric-unit">
+                kg
+                </p>
+
                 </div>
 
-                <div class="metric-card" id="card_total_debt">
-                    <h3>Total Outstanding Debt</h3>
-                    <p class="metric-value" id="metric_total_debt">-</p>
-                    <p class="metric-unit">USD</p>
+
+
+                <div class="metric-card">
+
+                <h3>Bales Sold</h3>
+
+                <p class="metric-value" id="metric_total_bales">
+                -
+                </p>
+
+                <p class="metric-unit">
+                bales
+                </p>
+
                 </div>
-            </div>
+
+
+
+                <div class="metric-card">
+
+                <h3>Rejected Bales</h3>
+
+                <p class="metric-value" id="metric_rejected_bales">
+                -
+                </p>
+
+                <p class="metric-unit">
+                bales
+                </p>
+
+                </div>
+
+
+
+                <div class="metric-card">
+
+                <h3>Average Price</h3>
+
+                <p class="metric-value" id="metric_average_price">
+                -
+                </p>
+
+                <p class="metric-unit">
+                USD/kg
+                </p>
+
+                </div>
+
+
+
+                <div class="metric-card">
+
+                <h3>Total Revenue</h3>
+
+                <p class="metric-value" id="metric_total_revenue">
+                -
+                </p>
+
+                <p class="metric-unit">
+                USD
+                </p>
+
+                </div>
+
+
+
+                <div class="metric-card">
+
+                <h3>Debt Recovered</h3>
+
+                <p class="metric-value" id="metric_debt_recovered">
+                -
+                </p>
+
+                <p class="metric-unit">
+                %
+                </p>
+
+                </div>
+
+
+
+                <div class="metric-card">
+
+                <h3>Outstanding Debt</h3>
+
+                <p class="metric-value" id="metric_total_debt">
+                -
+                </p>
+
+                <p class="metric-unit">
+                USD
+                </p>
+
+                </div>
+
+
+                </div>
         </div>
     </div>
 </div>
@@ -239,46 +312,73 @@ if ($grower_id) {
             console.error('Error loading charts', e);
         }
     }
+    
     function populateKpiCards(metrics) {
-        // Total kgs sold
-        const kgEl = document.getElementById('metric_total_kgs');
-        const revEl = document.getElementById('metric_total_revenue');
-        const debtPctEl = document.getElementById('metric_debt_recovered');
-        const totalDebtEl = document.getElementById('metric_total_debt');
-        if (kgEl) kgEl.textContent = (metrics.total_production ?? 0).toLocaleString('en-US', {maximumFractionDigits:0});
-        if (revEl) revEl.textContent = `$${(metrics.total_revenue ?? 0).toLocaleString('en-US', {maximumFractionDigits:2})}`;
-        if (debtPctEl) debtPctEl.textContent = `${(metrics.debt_recovered_percent ?? 0)}%`;
-        if (totalDebtEl) totalDebtEl.textContent = `$${(metrics.total_debt ?? 0).toLocaleString('en-US', {maximumFractionDigits:2})}`;
 
-        // Render debt progress doughnut
-        try {
-            const pct = Math.max(0, Math.min(100, parseFloat(metrics.debt_recovered_percent || 0)));
-            const ctx = document.getElementById('debtProgressChart').getContext('2d');
-            // destroy existing chart instance if present
-            if (window._debtProgressChart instanceof Chart) {
-                window._debtProgressChart.destroy();
-            }
-            window._debtProgressChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Recovered', 'Remaining'],
-                    datasets: [{
-                        data: [pct, Math.max(0, 100 - pct)],
-                        backgroundColor: [LeafLinkCharts.colors.success, LeafLinkCharts.colors.warning],
-                        borderColor: ['#fff', '#fff'],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    cutout: '70%'
-                }
-            });
-        } catch (err) {
-            console.error('Debt progress chart error', err);
-        }
+
+        const kgEl=document.getElementById('metric_total_kgs');
+        const balesEl=document.getElementById('metric_total_bales');
+        const rejectedEl=document.getElementById('metric_rejected_bales');
+        const priceEl=document.getElementById('metric_average_price');
+        const revEl=document.getElementById('metric_total_revenue');
+        const debtPctEl=document.getElementById('metric_debt_recovered');
+        const debtEl=document.getElementById('metric_total_debt');
+
+
+
+        if(kgEl)
+        kgEl.textContent =
+        (metrics.total_production ?? 0)
+        .toLocaleString('en-US',{
+        maximumFractionDigits:0
+        });
+
+
+
+        if(balesEl)
+        balesEl.textContent =
+        (metrics.total_bales ?? 0);
+
+
+
+        if(rejectedEl)
+        rejectedEl.textContent =
+        (metrics.rejected_bales ?? 0);
+
+
+
+        if(priceEl)
+        priceEl.textContent =
+        "$"+(metrics.average_price ?? 0)
+        .toLocaleString('en-US',{
+        minimumFractionDigits:2
+        });
+
+
+
+        if(revEl)
+        revEl.textContent =
+        "$"+(metrics.total_revenue ?? 0)
+        .toLocaleString('en-US',{
+        minimumFractionDigits:2
+        });
+
+
+
+        if(debtPctEl)
+        debtPctEl.textContent =
+        (metrics.debt_recovered_percent ?? 0)+"%";
+
+
+
+        if(debtEl)
+        debtEl.textContent =
+        "$"+(metrics.total_debt ?? 0)
+        .toLocaleString('en-US',{
+        minimumFractionDigits:2
+        });
+
+
     }
 
     function initDateInputs() {

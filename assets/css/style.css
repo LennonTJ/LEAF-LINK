@@ -517,4 +517,212 @@ body{
     font-size: 16px;
     margin-bottom: 10px;
 }
+/* ============================================
+   LEAFLINK KPI SUMMARY CARDS
+   ============================================ */
 
+
+.metrics-row{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+
+    gap:15px;
+
+    margin:20px 0 30px 0;
+
+}
+
+
+
+.metric-card{
+
+    background:#ffffff;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    text-align:center;
+
+    box-shadow:0 3px 8px rgba(0,0,0,.08);
+
+    height:120px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    border-left:4px solid #0bca44;
+
+}
+
+
+
+.metric-card h3{
+
+    font-size:13px;
+
+    color:#666;
+
+    font-weight:600;
+
+    margin-bottom:8px;
+
+    text-transform:uppercase;
+
+}
+
+
+
+.metric-value{
+
+    font-size:26px;
+
+    font-weight:bold;
+
+    color:#2e7d32;
+
+    margin:3px 0;
+
+}
+
+
+
+.metric-unit{
+
+    font-size:12px;
+
+    color:#888;
+
+}
+
+
+
+/* Hide doughnut because KPI should stay compact */
+
+#debtProgressChart{
+
+    display:none !important;
+
+}
+
+
+
+/* Responsive */
+
+@media(max-width:1000px){
+
+    .metrics-row{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+
+@media(max-width:600px){
+
+    .metrics-row{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+.chart-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(450px,1fr));
+    gap:20px;
+}
+
+.chart-card{
+    background:#fff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 3px 8px rgba(0,0,0,.08);
+}
+
+/* ============================================
+   DASHBOARD CHART SIZING
+   ============================================ */
+
+
+.dashboard-grid canvas{
+
+    max-height:280px !important;
+
+}
+
+
+
+.dashboard-grid > div{
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    box-shadow:0 3px 8px rgba(0,0,0,.08);
+
+}
+
+/* ==========================================
+   FIX CHART SIZES
+========================================== */
+
+.dashboard-grid > div canvas{
+    width:100% !important;
+    height:260px !important;
+}
+
+
+/* Pie / doughnut chart smaller */
+#revenueDebtChart{
+    max-height:220px !important;
+}
+
+
+/* Keep KPI cards compact (rezsizing resolution that affected the pie chart to be too big)*/
+.metrics-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:15px;
+    margin:20px 0;
+}
+
+
+.metric-card{
+
+    height:110px;
+    padding:12px;
+
+}
+
+
+.metric-card h3{
+
+    font-size:12px;
+    margin-bottom:5px;
+
+}
+
+
+.metric-value{
+
+    font-size:24px;
+
+}
+
+
+.metric-unit{
+
+    font-size:11px;
+
+}
