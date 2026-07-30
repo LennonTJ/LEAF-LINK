@@ -292,24 +292,6 @@ Contractor Performance
 
     </div>
 
-
-    <div>
-
-        <h3>Best Performing Growers</h3>
-
-        <canvas id="growerChart"></canvas>
-
-    </div>
-
-
-    <div>
-
-        <h3>Grower Recovery Risk Classification</h3>
-
-        <canvas id="riskChart"></canvas>
-
-    </div>
-
 </div>
 
 <div class="card">
@@ -613,6 +595,188 @@ window.addEventListener(
 "load",
 loadRecoverySummary
 );
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+
+
+// ===============================
+// SALES TREND CHART
+// ===============================
+
+async function loadSalesTrend(){
+
+    try{
+
+        const res = await fetch(
+            "../api/contractor-data.php?action=sales_trend"
+        );
+
+        const data = await res.json();
+
+
+        const ctx = document
+        .getElementById("salesTrend")
+        .getContext("2d");
+
+
+        new Chart(ctx,{
+
+            type:"line",
+
+            data:{
+
+                labels:data.dates,
+
+                datasets:[{
+
+                    label:"Kg Sold",
+
+                    data:data.kgs,
+
+                    tension:0.3
+
+                }]
+
+            },
+
+
+            options:{
+
+                responsive:true,
+
+                plugins:{
+
+                    legend:{
+                        display:true
+                    }
+
+                },
+
+
+                scales:{
+
+                    y:{
+
+                        beginAtZero:true,
+
+                        title:{
+                            display:true,
+                            text:"Kilograms"
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Sales trend error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+
+// ===============================
+// GRADE DISTRIBUTION CHART
+// ===============================
+
+async function loadGradeDistribution(){
+
+    try{
+
+
+        const res = await fetch(
+            "../api/contractor-data.php?action=grade_distribution"
+        );
+
+
+        const data = await res.json();
+
+
+
+        const ctx = document
+        .getElementById("gradeChart")
+        .getContext("2d");
+
+
+
+        new Chart(ctx,{
+
+            type:"doughnut",
+
+
+            data:{
+
+
+                labels:data.grades,
+
+
+                datasets:[{
+
+                    label:"Kg",
+
+                    data:data.kgs
+
+                }]
+
+            },
+
+
+            options:{
+
+                responsive:true
+
+            }
+
+
+        });
+
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Grade chart error:",
+            error
+        );
+
+    }
+
+
+}
+
+
+
+
+// LOAD DASHBOARD DATA
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+
+    loadSalesTrend();
+
+    loadGradeDistribution();
+
+});
+
 
 </script>
 

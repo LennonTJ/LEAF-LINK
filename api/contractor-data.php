@@ -64,7 +64,7 @@ if(!$contractor_id){
 
         /*
         |--------------------------------------------------------------------------
-        | FALLBACK: username -> contractor_code
+        | FALLBACK: username -> contractor
         |--------------------------------------------------------------------------
         */
 
@@ -269,6 +269,152 @@ return [
 
 }
 
+// grade dist and sale ttrends: 
+function getSalesTrend($contractor_id){
+
+global $conn;
+
+
+$sql="
+SELECT
+DATE(s.sale_date) AS sale_date,
+SUM(s.sold_mass) AS kg,
+SUM(s.gross_value) AS revenue
+
+FROM sales s
+
+JOIN growers g
+ON s.grower_no=g.grower_no
+
+JOIN contracts c
+ON c.grower_id=g.grower_id
+
+WHERE c.contractor_id=?
+
+GROUP BY DATE(s.sale_date)
+
+ORDER BY sale_date ASC
+";
+
+
+$stmt=mysqli_prepare($conn,$sql);
+
+mysqli_stmt_bind_param(
+$stmt,
+"i",
+$contractor_id
+);
+
+mysqli_stmt_execute($stmt);
+
+
+$result=mysqli_stmt_get_result($stmt);
+
+
+$dates=[];
+$kgs=[];
+$revenues=[];
+
+
+while($row=mysqli_fetch_assoc($result)){
+
+$dates[]=$row['sale_date'];
+$kgs[]=(float)$row['kg'];
+$revenues[]=(float)$row['revenue'];
+
+}
+
+
+return [
+
+"dates"=>$dates,
+"kgs"=>$kgs,
+"revenues"=>$revenues
+
+];
+
+}
+
+
+
+
+function getGradeDistribution($contractor_id){
+
+global $conn;
+
+
+$sql="
+SELECT
+
+sg.grade,
+SUM(sg.mass) AS kg
+
+
+FROM sale_grades sg
+
+
+JOIN sales s
+ON sg.sale_id=s.sale_id
+
+
+JOIN growers g
+ON s.grower_no=g.grower_no
+
+
+JOIN contracts c
+ON c.grower_id=g.grower_id
+
+
+WHERE c.contractor_id=?
+
+
+GROUP BY sg.grade
+
+ORDER BY kg DESC
+
+";
+
+
+$stmt=mysqli_prepare($conn,$sql);
+
+mysqli_stmt_bind_param(
+$stmt,
+"i",
+$contractor_id
+);
+
+mysqli_stmt_execute($stmt);
+
+
+$result=mysqli_stmt_get_result($stmt);
+
+
+
+$grades=[];
+$kgs=[];
+
+
+while($row=mysqli_fetch_assoc($result)){
+
+
+$grades[]=$row['grade'];
+$kgs[]=(float)$row['kg'];
+
+
+}
+
+
+
+return [
+
+"grades"=>$grades,
+"kgs"=>$kgs
+
+];
+
+
+}
+
 
 function getMetrics($contractor_id){
 
@@ -379,6 +525,23 @@ case "recovery_summary":
 
 echo json_encode(
     getRecoverySummary($contractor_id)
+);
+
+break;
+
+case "sales_trend":
+
+echo json_encode(
+getSalesTrend($contractor_id)
+);
+
+break;
+
+
+case "grade_distribution":
+
+echo json_encode(
+getGradeDistribution($contractor_id)
 );
 
 break;
