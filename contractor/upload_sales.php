@@ -93,7 +93,7 @@ if (isset($_POST['upload']) && isset($_FILES['sale_pdf'])) {
                 mkdir($upload_dir, 0777, true);
             }
 
-            $new_name = "TIMB_" . date("Ymd_His") . ".pdf";
+            $new_name = "Sales-Sheet_" . date("Ymd_His") . ".pdf";
             $destination = $upload_dir . $new_name;
 
             if (move_uploaded_file($_FILES['sale_pdf']['tmp_name'], $destination)) {
@@ -162,14 +162,14 @@ if (isset($_POST['upload']) && isset($_FILES['sale_pdf'])) {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Upload TIMB Sale Sheet</title>
+    <title>Upload Sale Sheet</title>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 
 <div class="header">
     <h1>LeafLink</h1>
-    <p>TIMB Sale Sheet Import</p>
+    <p> Sale Sheet Import</p>
 </div>
 
 <div class="layout">
@@ -178,17 +178,13 @@ if (isset($_POST['upload']) && isset($_FILES['sale_pdf'])) {
         <h3>Contractor</h3>
         <hr>
         <a href="dashboard.php">Dashboard</a>
-        <a href="upload_sales.php">Upload Sale Sheet</a>
-        <a href="#">Sales History</a>
-        <hr>
-        <a href="../auth/logout.php">Logout</a>
     </div>
 
     <div class="content">
 
         <div class="card">
 
-            <h2>Upload Official TIMB Purchased Bales PDF</h2>
+            <h2>Upload Official Sales Sheet PDF</h2>
 
             <?php if ($message != "") { ?>
                 <p><strong><?php echo htmlspecialchars($message); ?></strong></p>

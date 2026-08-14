@@ -135,17 +135,8 @@ $extra_lookup = [
     "G" => "Green",
 ];
 
-// Dynamic lists loaded from DB for form selects
-$plant_positions = [];
-$pp_res = mysqli_query($conn, "SELECT DISTINCT plant_position FROM projection_prices ORDER BY plant_position");
-if ($pp_res) {
-    while ($r = mysqli_fetch_assoc($pp_res)) {
-        $plant_positions[] = $r['plant_position'];
-    }
-} else {
-    // fallback
-    $plant_positions = ['P','X','C','L','T'];
-}
+// Plant positions used by TIMB grading
+$plant_positions = ['P', 'X', 'C', 'L', 'T'];
 
 $qualities = [];
 $q_res = mysqli_query($conn, "SELECT quality_code, description FROM tobacco_quality ORDER BY quality_code ASC");
@@ -197,34 +188,57 @@ if (empty($extras)) {
 if(isset($_POST['project']))
 {
     // Read inputs
-    $plant_position = $_POST['plant_position'] ?? '';
-    $quality = $_POST['quality'] ?? '';// expected as 1..5
-    $colour = $_POST['colour'] ?? '';
-    $style = $_POST['style'] ?? '';
-    $extra = $_POST['extra'] ?? '';
+    $plant_position = trim($_POST['plant_position'] ?? '');
+    $quality = trim($_POST['quality'] ?? '');
+    $colour = trim($_POST['colour'] ?? '');
+    $style = trim($_POST['style'] ?? '');
+    $extra = trim($_POST['extra'] ?? '');
     $kg = floatval($_POST['estimated_kg'] ?? 0);
 
-    // Build TIMB generated grade (e.g. L2OF)
-    $generated_grade = $plant_position . $quality . $colour . $style . $extra;
+    /*
+    |--------------------------------------------------------------------------
+    | BUILD GENERATED TIMB GRADE
+    |--------------------------------------------------------------------------
+    */
 
-    // Convert numeric quality to the textual form used in the existing price matrix
-    $price_quality = $quality_lookup[$quality] ?? $quality;
+    $generated_grade =
+        strtoupper(
+            $plant_position .
+            $quality .
+            $colour .
+            $style .
+            $extra
+        );
 
-    // Get today's estimated price using existing matrix (plant_position + textual quality)
-    $sql = "SELECT estimated_price
-            FROM projection_prices
-            WHERE plant_position = ?
-            AND quality = ?
-            ORDER BY price_date DESC
-            LIMIT 1";
 
-    $stmt = mysqli_prepare($conn,$sql);
+    /*
+    |--------------------------------------------------------------------------
+    | GET LATEST TIMB PRICE FOR GENERATED GRADE
+    |--------------------------------------------------------------------------
+    |
+    | The old system used projection_prices.
+    | We now use the uploaded TIMB Daily Average Price Matrix.
+    |
+    */
+
+    $sql = "
+        SELECT average_price
+        FROM price_matrix
+        WHERE grade = ?
+        ORDER BY price_date DESC
+        LIMIT 1
+    ";
+
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if (!$stmt) {
+        die("Failed to prepare price lookup: " . mysqli_error($conn));
+    }
 
     mysqli_stmt_bind_param(
         $stmt,
-        "ss",
-        $plant_position,
-        $price_quality
+        "s",
+        $generated_grade
     );
 
     mysqli_stmt_execute($stmt);
@@ -233,74 +247,132 @@ if(isset($_POST['project']))
 
     $price = mysqli_fetch_assoc($price_result);
 
-    if($price)
+
+    /*
+    |--------------------------------------------------------------------------
+    | NO PRICE FOUND
+    |--------------------------------------------------------------------------
+    */
+
+    if (!$price)
     {
-        $price_per_kg = floatval($price['estimated_price']);
+        $_SESSION['saved_message'] =
+            "No TIMB price was found for grade " .
+            $generated_grade .
+            ". Please upload the latest TIMB Daily Average Price Matrix.";
 
-        $revenue = $price_per_kg * $kg;
+        header('Location: projection.php');
+        exit();
+    }
 
-        $debt = floatval($grower['total_debt'] ?? 0);
 
-        $payout = $revenue - $debt;
+    /*
+    |--------------------------------------------------------------------------
+    | PRICE FOUND
+    |--------------------------------------------------------------------------
+    */
 
-        if($payout < 0)
-        {
-            $payout = 0;
-        }
+    $price_per_kg = floatval($price['average_price']);
 
-        // Recovery percentage
-        if($debt > 0)
-        {
-            $recovery = ($revenue / $debt) * 100;
-        }
-        else
-        {
-            $recovery = 100;
-        }
+    $revenue = $price_per_kg * $kg;
 
-        // Improved Risk thresholds
-        if($recovery >= 120)
-        {
-            $risk = "LOW";
-        }
-        elseif($recovery >= 100)
-        {
-            $risk = "MEDIUM";
-        }
-        else
-        {
-            $risk = "HIGH";
-        }
 
-        // Zero Pay
-        if($revenue <= $debt)
-        {
-            $zero_pay = "YES";
-        }
-        else
-        {
-            $zero_pay = "NO";
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | DEBT / PAYOUT
+    |--------------------------------------------------------------------------
+    |
+    | Leaving your existing prototype logic unchanged for now.
+    */
 
-        // Recommendation
-        if($risk == "LOW")
-        {
-            $recommendation =
-                "Excellent projection. This sale is expected to recover your debt and provide a positive payout.";
-        }
-        elseif($risk == "MEDIUM")
-        {
-            $recommendation =
-                "Debt recovery is expected, but the surplus may be limited.";
-        }
-        else
-        {
-            $recommendation =
-                "High risk of zero pay. Consider improving tobacco quality before marketing.";
-        }
+    $debt = floatval($grower['total_debt'] ?? 0);
 
-        // Auto-save projection on Analyse Sale (PRG): save now, then redirect to avoid double-insert on refresh
-        $save_sql = "
+    $payout = $revenue - $debt;
+
+    if($payout < 0)
+    {
+        $payout = 0;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RECOVERY PERCENTAGE
+    |--------------------------------------------------------------------------
+    */
+
+    if($debt > 0)
+    {
+        $recovery = ($revenue / $debt) * 100;
+    }
+    else
+    {
+        $recovery = 100;
+    }
+
+
+    //RECOVERY RISK
+
+    if($recovery >= 120)
+    {
+        $risk = "LOW";
+    }
+    elseif($recovery >= 100)
+    {
+        $risk = "MEDIUM";
+    }
+    else
+    {
+        $risk = "HIGH";
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ZERO PAY
+    |--------------------------------------------------------------------------
+    */
+
+    if($revenue <= $debt)
+    {
+        $zero_pay = "YES";
+    }
+    else
+    {
+        $zero_pay = "NO";
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RECOMMENDATION
+    |--------------------------------------------------------------------------
+    */
+
+    if($risk == "LOW")
+    {
+        $recommendation =
+            "Excellent projection. This sale is expected to recover your debt and provide a positive payout.";
+    }
+    elseif($risk == "MEDIUM")
+    {
+        $recommendation =
+            "Debt recovery is expected, but the surplus may be limited.";
+    }
+    else
+    {
+        $recommendation =
+            "High risk of zero pay. Consider improving tobacco quality before marketing.";
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE PROJECTION
+    |--------------------------------------------------------------------------
+    */
+
+    $save_sql = "
         INSERT INTO sale_projections
         (
             grower_id,
@@ -318,58 +390,97 @@ if(isset($_POST['project']))
         (
             ?,?,?,?,?,?,?,?,?,?
         )
-        ";
+    ";
 
-        $save_stmt = mysqli_prepare($conn,$save_sql);
-        if ($save_stmt) {
-            mysqli_stmt_bind_param(
-                $save_stmt,
-                "issddddsss",
-                $grower_id,
-                $plant_position,
-                $price_quality,
-                $kg,
-                $price_per_kg,
-                $revenue,
-                $payout,
-                $risk,
-                $zero_pay,
-                $generated_grade
-            );
+    $save_stmt = mysqli_prepare($conn, $save_sql);
 
-            $save_ok = mysqli_stmt_execute($save_stmt);
-            if ($save_ok) {
-                $_SESSION['saved_message'] = 'Projection saved successfully.';
-            } else {
-                $_SESSION['saved_message'] = 'Failed to save projection: ' . mysqli_error($conn);
-            }
-        } else {
-            $_SESSION['saved_message'] = 'Failed to prepare save statement: ' . mysqli_error($conn);
+    if ($save_stmt)
+    {
+        mysqli_stmt_bind_param(
+            $save_stmt,
+            "issddddsss",
+            $grower_id,
+            $plant_position,
+            $quality,
+            $kg,
+            $price_per_kg,
+            $revenue,
+            $payout,
+            $risk,
+            $zero_pay,
+            $generated_grade
+        );
+
+        $save_ok = mysqli_stmt_execute($save_stmt);
+
+        if ($save_ok)
+        {
+            $_SESSION['saved_message'] =
+                'Projection saved successfully.';
         }
-
-        // Store last projection in session for display after redirect
-        $_SESSION['last_projection'] = [
-            'generated_grade' => $generated_grade,
-            'price_per_kg' => $price_per_kg,
-            'revenue' => $revenue,
-            'debt' => $debt,
-            'payout' => $payout,
-            'recovery' => $recovery,
-            'risk' => $risk,
-            'zero_pay' => $zero_pay,
-            'recommendation' => $recommendation,
-            'plant_position' => $plant_position,
-            'quality' => $quality,
-            'colour' => $colour,
-            'style' => $style,
-            'extra' => $extra,
-        ];
-
-        // Redirect to same page (Post/Redirect/Get) so refreshing won't re-submit the form
-        header('Location: projection.php');
-        exit();
+        else
+        {
+            $_SESSION['saved_message'] =
+                'Failed to save projection: ' .
+                mysqli_error($conn);
+        }
+    }
+    else
+    {
+        $_SESSION['saved_message'] =
+            'Failed to prepare save statement: ' .
+            mysqli_error($conn);
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | STORE LAST PROJECTION FOR DISPLAY
+    |--------------------------------------------------------------------------
+    */
+
+    $_SESSION['last_projection'] = [
+
+        'generated_grade' => $generated_grade,
+
+        'price_per_kg' => $price_per_kg,
+
+        'revenue' => $revenue,
+
+        'debt' => $debt,
+
+        'payout' => $payout,
+
+        'recovery' => $recovery,
+
+        'risk' => $risk,
+
+        'zero_pay' => $zero_pay,
+
+        'recommendation' => $recommendation,
+
+        'plant_position' => $plant_position,
+
+        'quality' => $quality,
+
+        'colour' => $colour,
+
+        'style' => $style,
+
+        'extra' => $extra
+
+    ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | REDIRECT
+    |--------------------------------------------------------------------------
+    */
+
+    header('Location: projection.php');
+
+    exit();
 }
 ?>
 

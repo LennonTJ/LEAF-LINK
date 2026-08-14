@@ -304,7 +304,7 @@ catch(Exception $e){
 
 
 <p>
-The TIMB sale sheet has been imported successfully.
+sale sheet has been imported successfully.
 </p>
 
 

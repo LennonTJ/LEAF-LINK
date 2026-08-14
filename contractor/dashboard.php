@@ -119,14 +119,11 @@ if ($contractor_id) {
 
 </head>
 
-<body>
+<body class="dashboard-page">
 
 <div class="header">
-
-<h1>LeafLink</h1>
-
-<h2><?php echo htmlspecialchars($contractor_name); ?></h2>
-
+    <h1>LeafLink</h1>
+    <span class="header-portal">Contractor Portal</span>
 </div>
 
 <div class="layout">
@@ -149,15 +146,9 @@ if ($contractor_id) {
 
 <a href="upload_sales.php">Upload Sale sheets</a>
 
+<a href="upload_price_matrix.php">Upload Price Matrix</a>
+
 <a href="#">Sales History</a>
-
-<h4>Finance</h4>
-
-<a href="#">Payments</a>
-
-<h4>Account</h4>
-
-<a href="#">My Profile</a>
 
 <hr>
 
@@ -165,24 +156,28 @@ if ($contractor_id) {
 
 </div>
 
-    <div class="hero">
-        <div class="content">
+<div class="content">
 
-    <div class="container">
-
-<div class="card">
-
-<h2>Welcome <?php echo htmlspecialchars($contractor_name); ?></h2>
-
-<p>Current Season :
-<strong><?php echo htmlspecialchars($current_season ?: date('Y')); ?></strong></p>
-
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="header-greeting">
+        <h2>Welcome, <?php echo htmlspecialchars($contractor_name); ?></h2>
+    </div>
+    <div class="header-badges">
+        <span class="info-badge badge-season">
+            <span class="badge-label">Season</span>
+            <span class="badge-value"><?php echo htmlspecialchars($current_season ?: date('Y')); ?></span>
+        </span>
+        <span class="info-badge badge-contractor">
+            <span class="badge-label">Growers</span>
+            <span class="badge-value"><?php echo (int)$assigned_growers; ?> active</span>
+        </span>
+        <span class="info-badge badge-contractor">
+            <span class="badge-label">Contracts</span>
+            <span class="badge-value"><?php echo (int)$active_contracts; ?> active</span>
+        </span>
+    </div>
 </div>
-
-
-<h2 style="margin:20px 0;">
-Contractor Performance
-</h2>
 
 
 <div class="metrics-row">
@@ -353,6 +348,8 @@ Growers
 
 </div>
 
+
+</div>
 
 </div>
 
@@ -784,4 +781,3 @@ document.addEventListener(
 
 </body>
 </html>
-

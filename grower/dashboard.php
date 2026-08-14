@@ -52,10 +52,10 @@ if ($grower_id) {
     <link rel="stylesheet" href="../assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
-<body>
+<body class="dashboard-page">
 <div class="header">
     <h1>LeafLink</h1>
-    <p>Grower Self-Service Portal</p>
+    <span class="header-portal">Grower Portal</span>
 </div>
 
 <div class="layout">
@@ -65,17 +65,8 @@ if ($grower_id) {
 
         <a href="#">Dashboard</a>
 
-        <h4>My Account</h4>
-        <a href="#">My Profile</a>
-
-        <h4>Finance</h4>
-        <a href="#">Financial Summary</a>
-
-        <h4>Sales</h4>
-        <a href="#">Sales History</a>
-
-        <h4>Sale Projection</h4>
-        <a href="projection.php">Sale Projection</a>
+        <h4>Sale Simulationtion</h4>
+        <a href="projection.php">Simulate Sale</a>
 
         <h4>Support</h4>
         <a href="#">Contact Contractor</a>
@@ -394,4 +385,3 @@ if ($grower_id) {
 
     document.addEventListener('DOMContentLoaded', () => { initDateInputs(); loadCharts(); });
 </script>
-
