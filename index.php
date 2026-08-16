@@ -148,7 +148,7 @@
 
 <div class="header">
     <a style = "text-decoration: none" href='index.php' > <h1 style="color: #ffffff;">LeafLink</h1> </a>
-    <p>Contract Farming Management System</p>
+    <p></p>
 </div>
 
 <div class="hero">
