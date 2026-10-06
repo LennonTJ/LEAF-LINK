@@ -161,7 +161,6 @@
             <div style="padding:0 35px 35px 35px; display:flex; flex-direction:column; gap:17px; align-items:flex-start;">
                 <a class="btn" href="auth/login.php?role=grower">Grower Portal</a>
                 <a class="btn" href="auth/login.php?role=contractor">Contractor Portal</a>
-                <a class="btn" href="auth/login.php?role=admin">Administrator Portal</a>
             </div>
     </div>
 </div>
